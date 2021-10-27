@@ -24,8 +24,7 @@ int main() {
     }
 
     memset(&serveraddr, 0, sizeof(serveraddr));
-    memset(&clientaddr, 0, sizeof(clientaddr));
-
+    
     // Filling server information
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = INADDR_ANY;
@@ -42,6 +41,9 @@ int main() {
     
     // Looping for messages
     while (true) {
+        memset(&clientaddr, 0, sizeof(clientaddr));
+        memset(buffer, 0, MAXLINE);
+        
         messageLength = recvfrom(sockfd, (char*)buffer, MAXLINE, MSG_WAITALL, (struct sockaddr*)&clientaddr, (socklen_t*)&len);
         buffer[messageLength] = '\0';
 
@@ -62,12 +64,10 @@ int main() {
             currChar = buffer[++index];
         }
         
-        if (strcmp(username, "mor") == 0 && strcmp(password, "cohen") == 0) {
-            std::cout << "OK!\n";
-        }
-        else {
-            std::cout << "WRONG!\n";
-        }
+        const char* response = strcmp(username, "mor") == 0 && strcmp(password, "cohen") == 0 ? "OK!" : "WRONG!";
+
+        std::cout << response << "\n";
+        sendto(sockfd, response, strlen(response), MAXLINE, (const struct sockaddr*)&clientaddr, len);
     }
     
     return 0;

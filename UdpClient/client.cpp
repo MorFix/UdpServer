@@ -16,10 +16,12 @@ using namespace std;
 
 // Driver code
 int main() {
-    int sockfd;
+    int sockfd, reslen;
     char* username = new char[MAXLINE / 2];
     char* password = new char[MAXLINE / 2];
     char message[MAXLINE];
+    char response[MAXLINE];
+
     struct sockaddr_in servaddr; 
 
     // SOCK_DGRAM means UDP
@@ -29,7 +31,8 @@ int main() {
     }
 
     memset(&servaddr, 0, sizeof(servaddr));
-
+    memset(message, 0, MAXLINE);
+        
     // Filling server information
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
@@ -46,6 +49,10 @@ int main() {
     strncat(message, password, sizeof(char) * MAXLINE / 2);
 
     sendto(sockfd, message, strlen(message), MSG_CONFIRM, (const struct sockaddr*)&servaddr, sizeof(servaddr));
+    recvfrom(sockfd, response, MAXLINE, MSG_WAITALL, (struct sockaddr*)&servaddr, (socklen_t*)&reslen);
+    
+    cout << response << "\n";
+
     close(sockfd);
 
     return 0;
